@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>增长计算器</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #666;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .output {
+      margin-top: 20px;
+    }
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+    }
+
+    li {
+      margin-bottom: 5px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>增长计算器</h1>
+
+  <label for="price">价格：</label>
+  <input type="text" id="price" />
+
+  <br />
+
+  <label for="rate">增长率：</label>
+  <select id="rate">
+    <option value="5">5%</option>
+    <option value="10" selected>10%</option>
+    <option value="20">20%</option>
+    <option value="30">30%</option>
+  </select>
+
+  <br />
+
+  <label for="times">增长次数：</label>
+  <input type="text" id="times" />
+
+  <br />
+
+  <button onclick="calculate()">计算</button>
+
+  <div class="output">
+    <h2>增长数值：</h2>
+    <ul id="result"></ul>
+    <a id="downloadLink" href="#" download="growth_chart.png" style="display: none;">下载图片</a>
+  </div>
+</div>
+
+<script>
+  function calculate() {
+    const priceInput = document.getElementById('price');
+    var rateSelect = document.getElementById('rate');
+    var timesInput = document.getElementById('times');
+    var resultUl = document.getElementById('result');
+    var downloadLink = document.getElementById('downloadLink');
+
+    var price = parseFloat(priceInput.value);
+    var rate = parseFloat(rateSelect.value);
+    var times = parseInt(timesInput.value);
+
+    // 清空结果列表
+    resultUl.innerHTML = '';
+
+    var growth = price;
+
+    for (var i = 0; i < times; i++) {
+      growth += growth * (rate / 100);
+      growth = roundToTwoDecimals(growth); // 使用四舍五入规则限制增长率
+
+      var listItem = document.createElement('li');
+      listItem.textContent = '增长' + (i + 1) + '：' + growth.toFixed(2);
+      resultUl.appendChild(listItem);
+    }
+
+    // 将结果生成为图片
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    context.font = '16px Arial';
+    context.fillStyle = '#333';
+
+    // 绘制结果列表
+    var y = 20;
+
+    for (var i = 0; i < resultUl.children.length; i++) {
+      var listItem = resultUl.children[i];
+      context.fillText(listItem.textContent, 20, y);
+      y += 20;
+    }
+
+    // 将Canvas转换为图片并设置下载链接
+    canvas.toBlob(function(blob) {
+      var url = URL.createObjectURL(blob);
+      downloadLink.href = url;
+      downloadLink.style.display = 'block';
+    });
+  }
+
+
+    function roundToTwoDecimals(number) {
+      return Math.round(number * 100) / 100;
+    }
+  </script>
+</body>
+</html>
